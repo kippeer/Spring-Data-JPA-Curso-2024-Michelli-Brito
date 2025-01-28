@@ -29,6 +29,10 @@ public class BookService {
         this.publisherRepository = publisherRepository;
     }
 
+    public List<BookModel> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
 
     @Transactional
     public BookModel saveBook(BookRecordDto bookRecordDto) {
@@ -43,5 +47,10 @@ public class BookService {
         book.setReview(reviewModel);
 
         return bookRepository.save(book);
+    }
+
+    @Transactional
+    public void deleteBook(UUID id){
+        bookRepository.deleteById(id);
     }
 }
