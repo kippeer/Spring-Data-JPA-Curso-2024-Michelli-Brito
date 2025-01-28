@@ -32,5 +32,7 @@ public class BookModel implements Serializable{
             inverseJoinColumns = @JoinColumn(name = "author_id"))
     private Set<AuthorModel> authors = new HashSet<>();
 
+    @OneToOne(mappedBy= "book",cascade = CascadeType.ALL)
+    private ReviewModel review;
 
 }

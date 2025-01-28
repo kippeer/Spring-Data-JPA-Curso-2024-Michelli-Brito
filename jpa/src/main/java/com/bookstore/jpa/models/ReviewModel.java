@@ -1,4 +1,5 @@
 package com.bookstore.jpa.models;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,10 @@ public class ReviewModel implements Serializable{
     
     @Column(nullable = false,unique = true)
     private String comment;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @OneToOne
+    @JoinColumn(name = "book_id")
+    private BookModel book;
 
 }
