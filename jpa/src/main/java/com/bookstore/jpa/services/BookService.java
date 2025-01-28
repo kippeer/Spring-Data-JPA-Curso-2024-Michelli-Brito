@@ -1,14 +1,18 @@
 package com.bookstore.jpa.services;
 
+import com.bookstore.jpa.dtos.BookRecordDto;
 import com.bookstore.jpa.models.BookModel;
+import com.bookstore.jpa.models.ReviewModel;
 import com.bookstore.jpa.repositories.AuthorRepository;
 import com.bookstore.jpa.repositories.BookRepository;
 import com.bookstore.jpa.repositories.PublisherRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -25,24 +29,19 @@ public class BookService {
         this.publisherRepository = publisherRepository;
     }
 
-    // Salvar um novo livro
-    public BookModel saveBook(BookModel bookModel) {
-        // Regras de validação, se necessário (ex.: validar se autores e publisher existem)
-        return bookRepository.save(bookModel);
-    }
 
-    // Listar todos os livros
-    public List<BookModel> listAllBooks() {
-        return bookRepository.findAll();
-    }
+    @Transactional
+    public BookModel saveBook(BookRecordDto bookRecordDto) {
+        BookModel book = new BookModel();
+        book.setTitle(bookRecordDto.title());
+        book.setPublisher(publisherRepository.findById(bookRecordDto.publisherId()).get());
+        book.setAuthors(authorRepository.findAllById(bookRecordDto.authorsIds()).stream().collect(Collectors.toSet()));
 
-    // Deletar livro por ID
-    public void deleteBook(UUID id) {
-        Optional<BookModel> book = bookRepository.findById(id);
-        if (book.isPresent()) {
-            bookRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Book not found with id: " + id);
-        }
+        ReviewModel reviewModel = new ReviewModel();
+        reviewModel.setComment(bookRecordDto.reviewComment());
+        reviewModel.setBook(book);
+        book.setReview(reviewModel);
+
+        return bookRepository.save(book);
     }
 }
